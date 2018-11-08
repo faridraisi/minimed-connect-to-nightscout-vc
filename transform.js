@@ -49,7 +49,7 @@ var guessPumpOffset = (function() {
 
 function deviceStatusEntry(data, offset) {
   return {
-    'created_at': timestampAsString(data['lastMedicalDeviceDataUpdateServerTime']),
+    'created_at': data['lastMedicalDeviceDataUpdateServerTime'],
     'device': deviceName(data),
     'uploader': {
       'battery': data['conduitBatteryLevel'],
@@ -60,10 +60,10 @@ function deviceStatusEntry(data, offset) {
       },
       'reservoir': data['reservoirAmount'],
       'iob': {
-        'timestamp': timestampAsString(data['lastMedicalDeviceDataUpdateServerTime']),
+        'timestamp': data['lastMedicalDeviceDataUpdateServerTime'],
         'bolusiob': _.get(data, 'activeInsulin.amount') >= 0 ? _.get(data, 'activeInsulin.amount') : undefined,
       },
-      'clock': timestampAsString(parsePumpTime(data['sMedicalDeviceTime'], offset)),
+      'clock': data['sMedicalDeviceTime'],
       // TODO: add last alarm from data['lastAlarm']['code'] and data['lastAlarm']['datetime']
       // https://gist.github.com/mddub/a95dc120d9d1414a433d#file-minimed-connect-codes-js-L79
     },
@@ -89,12 +89,12 @@ function sgvEntries(data, offset) {
   var sgvs = data['sgs'].filter(function(entry) {
     return entry['kind'] === 'SG' && entry['sg'] !== 0;
   }).map(function(sgv) {
-    var timestamp = parsePumpTime(sgv['datetime'], offset);
+    var timestamp = sgv['datetime'];
     return {
       'type': SENSOR_GLUCOSE_ENTRY_TYPE,
       'sgv': sgv['sg'],
-      'date': timestamp,
-      'dateString': timestampAsString(timestamp),
+      'date': sgv['datetime'],
+      'dateString': timestamp,
       'device': deviceName(data),
     };
   });

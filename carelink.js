@@ -9,13 +9,14 @@ var logger = require('./logger');
 
 var DEFAULT_MAX_RETRY_DURATION = module.exports.defaultMaxRetryDuration = 512;
 
-var CARELINK_SECURITY_URL = 'https://carelink.minimed.com/patient/j_security_check';
-var CARELINK_AFTER_LOGIN_URL = 'https://carelink.minimed.com/patient/main/login.do';
-var CARELINK_JSON_BASE_URL = 'https://carelink.minimed.com/patient/connect/ConnectViewerServlet?cpSerialNumber=NONE&msgType=last24hours&requestTime=';
+var CARELINK_SECURITY_URL = 'https://carelink.minimed.eu/patient/j_security_check';
+var CARELINK_AFTER_LOGIN_URL = 'https://carelink.minimed.eu/patient/main/login.do';
+var CARELINK_JSON_BASE_URL = 'https://carelink.minimed.eu/patient/connect/ConnectViewerServlet?cpSerialNumber=NONE&msgType=last12hours&requestTime=';
 var CARELINK_LOGIN_COOKIE = '_WL_AUTHCOOKIE_JSESSIONID';
 
 var carelinkJsonUrlNow = function() {
-  return CARELINK_JSON_BASE_URL + Date.now();
+  var theDate = new Date();
+  return CARELINK_JSON_BASE_URL + 1537444800; //theDate.getTime();
 };
 
 function reqOptions(extra) {
@@ -23,7 +24,7 @@ function reqOptions(extra) {
     jar: true,
     followRedirect: false,
     headers: {
-      Host: 'carelink.minimed.com',
+      Host: 'carelink.minimed.eu',
       Connection: 'keep-alive',
       Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:41.0) Gecko/20100101 Firefox/41.0',
@@ -129,6 +130,7 @@ var Client = exports.Client = function (options) {
 
   function parseData(response, next) {
     var parsed;
+    logger.log(response.body);
     try {
       parsed = JSON.parse(response.body);
     } catch (e) {
